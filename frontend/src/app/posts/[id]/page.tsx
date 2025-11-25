@@ -1,6 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+type User = {
+	id_usuario: number;
+	nome: string;
+	tipo_usuario: "SUPORTE" | "SOLICITANTE";
+};
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { API_BASE_URL } from "@/services/api";
@@ -20,6 +25,8 @@ export default function PostDetailPage() {
 	const router = useRouter();
 	const [post, setPost] = useState<Post | null>(null);
 	const [loading, setLoading] = useState(true);
+	const [user, setUser] = useState<User | null>(null);
+	const [showModal, setShowModal] = useState(false);
 
 	useEffect(() => {
 		async function load() {
@@ -38,12 +45,39 @@ export default function PostDetailPage() {
 		if (id) load();
 	}, [id, router]);
 
+	useEffect(() => {
+		const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+		if (!token) return;
+		async function fetchUser() {
+			try {
+				const res = await fetch(`${API_BASE_URL}/users/me`, {
+					headers: { Authorization: `Bearer ${token}` },
+				});
+				if (res.ok) {
+					const data = await res.json();
+					setUser(data);
+				}
+			} catch {}
+		}
+		fetchUser();
+	}, []);
+
 	if (loading) {
 		return <p className="text-sm text-slate-300">Carregando...</p>;
 	}
 
 	if (!post) {
 		return <p className="text-sm text-red-300">Chamado não encontrado.</p>;
+	}
+
+	// Lógica para editar
+	function handleEdit() {
+		if (!user) return;
+		if (user.tipo_usuario === "SUPORTE") {
+			router.push(`/posts/${post?.id_chamado}/edit`);
+		} else {
+			setShowModal(true);
+		}
 	}
 
 	return (
@@ -58,12 +92,12 @@ export default function PostDetailPage() {
 					</h1>
 				</div>
 				<div className="flex gap-2">
-					<Link
-						href={`/posts/${post.id_chamado}/edit`}
+					<button
+						onClick={handleEdit}
 						className="rounded-full bg-sky-500 px-4 py-2 text-xs font-semibold text-slate-950 shadow-md shadow-sky-500/40 transition hover:bg-sky-400"
 					>
 						Editar
-					</Link>
+					</button>
 					<Link
 						href="/dashboard"
 						className="rounded-full border border-slate-700 bg-slate-900/60 px-4 py-2 text-xs font-semibold text-slate-100 transition hover:border-emerald-400 hover:bg-emerald-500/10"
@@ -126,6 +160,31 @@ export default function PostDetailPage() {
 					</p>
 				</div>
 			</div>
+
+			{/* Modal para solicitante */}
+			{showModal && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+					<div className="w-full max-w-md rounded-xl bg-slate-900 p-6 shadow-2xl border border-emerald-500/30">
+						<h2 className="text-lg font-bold text-slate-50 mb-2">Editar chamado</h2>
+						<p className="text-sm text-slate-300 mb-4">Como solicitante, você só pode editar a descrição do problema.</p>
+						<button
+							className="w-full rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/40 transition hover:bg-emerald-400"
+							onClick={() => {
+								setShowModal(false);
+								router.push(`/posts/${post.id_chamado}/edit?solicitante=1`);
+							}}
+						>
+							Editar problema
+						</button>
+						<button
+							className="mt-3 w-full rounded-full border border-slate-700 bg-slate-900/60 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:border-emerald-400 hover:bg-emerald-500/10"
+							onClick={() => setShowModal(false)}
+						>
+							Cancelar
+						</button>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }

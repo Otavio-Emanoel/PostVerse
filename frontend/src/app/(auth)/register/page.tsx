@@ -109,7 +109,7 @@ export default function RegisterPage() {
 			<p className="text-xs text-slate-400">
 				Já tem uma conta?{" "}
 				<Link
-					href="/auth/login"
+					href="/login"
 					className="font-medium text-emerald-300 hover:text-emerald-200"
 				>
 					Entrar

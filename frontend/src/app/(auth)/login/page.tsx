@@ -80,7 +80,7 @@ export default function LoginPage() {
       <p className="text-xs text-slate-400">
         Não tem uma conta?{" "}
         <Link
-          href="/auth/register"
+          href="/register"
           className="font-medium text-emerald-300 hover:text-emerald-200"
         >
           Criar conta
