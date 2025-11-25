@@ -88,24 +88,29 @@ export default function DashboardPage() {
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {posts.map((post) => {
             const isMyPost = user && post.id_solicitante === user.id_usuario;
+            const isSuporte = user && user.tipo_usuario === "SUPORTE";
             return (
               <div
                 key={post.id_chamado}
                 className={`group relative overflow-hidden rounded-2xl border p-4 transition z-0
-                  ${isMyPost
-                    ? "border-emerald-500/70 bg-emerald-950/70 hover:border-emerald-400/90 hover:bg-emerald-900/90"
+                  ${isMyPost || isSuporte
+                    ? "border-emerald-500/70 bg-emerald-950/70 hover:border-emerald-400/90 hover:bg-emerald-900/90 cursor-pointer"
                     : "border-slate-700/70 bg-slate-900/70 opacity-70 cursor-not-allowed"}
                 `}
+                onClick={(e) => {
+                  // Se não for permitido, não faz nada
+                  if (!(isMyPost || isSuporte)) return;
+                  // Se for solicitante e clicar em botão, ignora
+                  if (
+                    isMyPost &&
+                    (e.target as HTMLElement).closest("button")
+                  ) {
+                    return;
+                  }
+                  router.push(`/posts/${post.id_chamado}`);
+                }}
               >
-                {/* Só permite entrar nos próprios chamados */}
-                {isMyPost ? (
-                  <Link
-                    href={`/posts/${post.id_chamado}`}
-                    className="absolute inset-0 z-10"
-                    aria-label={`Ver chamado ${post.id_chamado}`}
-                  />
-                ) : null}
-                <div className={`absolute inset-0 transition-opacity bg-gradient-to-br from-emerald-500/10 via-sky-500/10 to-transparent ${isMyPost ? "opacity-0 group-hover:opacity-100" : "opacity-0"}`} />
+                <div className={`absolute inset-0 transition-opacity bg-gradient-to-br from-emerald-500/10 via-sky-500/10 to-transparent ${(isMyPost || isSuporte) ? "opacity-0 group-hover:opacity-100" : "opacity-0"}`} />
                 <div className="relative space-y-2 z-20">
                   <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${isMyPost ? "bg-emerald-800/80 text-emerald-200" : "bg-slate-800/80 text-slate-300"}`}>
                     #{post.id_chamado.toString().padStart(3, "0")}
