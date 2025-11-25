@@ -173,6 +173,24 @@ paths:
           description: Lista de chamados do usuário
         '404':
           description: Usuário não encontrado
+  /utils/equipments:
+    get:
+      summary: Lista todos os equipamentos
+      responses:
+        '200':
+          description: Lista de equipamentos
+  /utils/locations:
+    get:
+      summary: Lista todos os locais
+      responses:
+        '200':
+          description: Lista de locais
+  /utils/logs:
+    get:
+      summary: Lista todos os logs de alteração de chamados
+      responses:
+        '200':
+          description: Lista de logs
 components:
   securitySchemes:
     bearerAuth:
