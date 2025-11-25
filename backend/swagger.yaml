@@ -53,3 +53,103 @@ paths:
           description: Campos obrigatórios ausentes
         '401':
           description: Credenciais inválidas
+  /posts:
+    get:
+      summary: Lista todos os chamados
+      responses:
+        '200':
+          description: Lista de chamados
+    post:
+      summary: Cria um chamado (protegido)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id_equipamento:
+                  type: integer
+                id_local:
+                  type: integer
+                id_solicitante:
+                  type: integer
+                descricao_problema:
+                  type: string
+      responses:
+        '201':
+          description: Chamado criado com sucesso
+        '400':
+          description: Campos obrigatórios ausentes
+        '401':
+          description: Não autorizado
+  /posts/{id}:
+    get:
+      summary: Busca chamado por id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Chamado encontrado
+        '404':
+          description: Chamado não encontrado
+    put:
+      summary: Atualiza chamado (protegido)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                descricao_problema:
+                  type: string
+                status:
+                  type: string
+                  enum: [ABERTO, EM_ANALISE, CONCLUIDO]
+                descricao_solucao:
+                  type: string
+      responses:
+        '200':
+          description: Chamado atualizado
+        '404':
+          description: Chamado não encontrado
+        '401':
+          description: Não autorizado
+    delete:
+      summary: Exclui chamado (protegido)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Chamado excluído
+        '404':
+          description: Chamado não encontrado
+        '401':
+          description: Não autorizado
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
