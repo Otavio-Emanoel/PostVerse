@@ -33,7 +33,24 @@ export default function CreatePostPage() {
 		setLoading(true);
 		const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 		if (!token) {
-			router.replace("/auth/login");
+			router.replace("/login");
+			return;
+		}
+
+		// Busca o usuário logado para pegar o id
+		let idSolicitante: number | null = null;
+		try {
+			const meRes = await fetch(`${API_BASE_URL}/users/me`, {
+				headers: { Authorization: `Bearer ${token}` },
+			});
+			if (meRes.ok) {
+				const meData = await meRes.json();
+				idSolicitante = meData.id_usuario;
+			}
+		} catch {}
+		if (!idSolicitante) {
+			setErro("Não foi possível identificar o usuário logado.");
+			setLoading(false);
 			return;
 		}
 
@@ -47,9 +64,7 @@ export default function CreatePostPage() {
 				body: JSON.stringify({
 					id_equipamento: Number(idEquipamento),
 					id_local: Number(idLocal),
-					// o backend exige id_solicitante; em cenário real viria do token.
-					// aqui usamos um valor simbólico e o backend pode ajustar depois.
-					id_solicitante: 1,
+					id_solicitante: idSolicitante,
 					descricao_problema: descricaoProblema,
 				}),
 			});
