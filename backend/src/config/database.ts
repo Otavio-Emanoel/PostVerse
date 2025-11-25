@@ -34,6 +34,7 @@ async function getDbConnection() {
   return mysql.createPool({
     ...DB_CONFIG,
     database: DB_NAME,
+    connectionLimit: 1000, // Limita para evitar excesso de conexões
   });
 }
 
