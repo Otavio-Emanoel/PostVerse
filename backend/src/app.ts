@@ -1,5 +1,6 @@
 
 import express from 'express';
+import cors from 'cors';
 import authRoutes from './routes/auth.routes';
 import postRoutes from './routes/post.routes';
 import userRoutes from './routes/user.routes';
@@ -11,6 +12,8 @@ const swaggerPath = path.join(__dirname, '../swagger.yaml');
 const swaggerDocument = YAML.load(swaggerPath);
 
 const app = express();
+app.use(cors());
+
 
 app.use(express.json());
 app.use('/api/auth', authRoutes);
