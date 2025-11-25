@@ -179,12 +179,56 @@ paths:
       responses:
         '200':
           description: Lista de equipamentos
+    post:
+      summary: Adiciona um novo equipamento (apenas SUPORTE)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                descricao:
+                  type: string
+                numero_serie:
+                  type: string
+      responses:
+        '201':
+          description: Equipamento adicionado com sucesso
+        '400':
+          description: Dados obrigatórios ausentes
+        '401':
+          description: Não autorizado
   /utils/locations:
     get:
       summary: Lista todos os locais
       responses:
         '200':
           description: Lista de locais
+    post:
+      summary: Adiciona um novo local (apenas SUPORTE)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nome_local:
+                  type: string
+                descricao:
+                  type: string
+      responses:
+        '201':
+          description: Local adicionado com sucesso
+        '400':
+          description: Dados obrigatórios ausentes
+        '401':
+          description: Não autorizado
   /utils/logs:
     get:
       summary: Lista todos os logs de alteração de chamados
