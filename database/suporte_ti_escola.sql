@@ -72,7 +72,7 @@ CREATE TABLE log_status_chamado (
     observacao      VARCHAR(255),
 
     CONSTRAINT fk_log_chamado
-        FOREIGN KEY (id_chamado) REFERENCES chamados(id_chamado),
+        FOREIGN KEY (id_chamado) REFERENCES chamados(id_chamado) ON DELETE CASCADE,
     CONSTRAINT fk_log_usuario
         FOREIGN KEY (alterado_por) REFERENCES usuarios(id_usuario)
 );

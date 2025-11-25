@@ -25,6 +25,8 @@ export default function DashboardPage() {
   const [userName, setUserName] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [postToDelete, setPostToDelete] = useState<Post | null>(null);
 
   useEffect(() => {
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
@@ -141,24 +143,65 @@ export default function DashboardPage() {
                       </Link>
                       <button
                         className="rounded-full bg-red-500 px-3 py-1 text-xs font-semibold text-white shadow-md shadow-red-500/40 transition hover:bg-red-400"
-                        onClick={async (e) => {
+                        onClick={(e) => {
                           e.stopPropagation();
                           e.preventDefault();
-                          if (confirm("Tem certeza que deseja deletar este chamado?")) {
-                            const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-                            if (!token) return;
-                            const res = await fetch(`${API_BASE_URL}/posts/${post.id_chamado}`, {
-                              method: "DELETE",
-                              headers: { Authorization: `Bearer ${token}` },
-                            });
-                            if (res.ok) {
-                              setPosts((prev) => prev.filter((p) => p.id_chamado !== post.id_chamado));
-                            }
-                          }
+                          setPostToDelete(post);
+                          setShowDeleteModal(true);
                         }}
                       >
                         Deletar
                       </button>
+                          {/* Modal de confirmação de exclusão */}
+                          {showDeleteModal && postToDelete && (
+                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+                              <div className="w-full max-w-md rounded-xl bg-slate-900 p-6 shadow-2xl border border-red-500/30">
+                                <h2 className="text-lg font-bold text-slate-50 mb-2">Confirmar exclusão</h2>
+                                <p className="text-sm text-slate-300 mb-4">
+                                  Tem certeza que deseja apagar o chamado <span className="font-bold text-red-300">#{postToDelete.id_chamado.toString().padStart(3, "0")}</span>? Essa ação não pode ser desfeita.
+                                </p>
+                                <div className="flex gap-2">
+                                  <button
+                                    className="w-full rounded-full bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-red-500/40 transition hover:bg-red-400"
+                                    onClick={async () => {
+                                      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+                                      if (!token) {
+                                        alert("Você precisa estar logado para apagar um chamado.");
+                                        return;
+                                      }
+                                      try {
+                                        const res = await fetch(`${API_BASE_URL}/posts/${postToDelete.id_chamado}`, {
+                                          method: "DELETE",
+                                          headers: { Authorization: `Bearer ${token}` },
+                                        });
+                                        if (res.ok) {
+                                          setPosts((prev) => prev.filter((p) => p.id_chamado !== postToDelete.id_chamado));
+                                          setShowDeleteModal(false);
+                                          setPostToDelete(null);
+                                        } else {
+                                          const data = await res.json();
+                                          alert(data.error || "Erro ao apagar chamado.");
+                                        }
+                                      } catch {
+                                        alert("Erro de conexão com o servidor.");
+                                      }
+                                    }}
+                                  >
+                                    Apagar chamado
+                                  </button>
+                                  <button
+                                    className="w-full rounded-full border border-slate-700 bg-slate-900/60 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:border-red-400 hover:bg-red-500/10"
+                                    onClick={() => {
+                                      setShowDeleteModal(false);
+                                      setPostToDelete(null);
+                                    }}
+                                  >
+                                    Cancelar
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                     </div>
                   )}
                 </div>
