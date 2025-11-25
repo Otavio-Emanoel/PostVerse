@@ -1,12 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { API_BASE_URL } from "@/services/api";
 
 export default function CreatePostPage() {
 	const [idEquipamento, setIdEquipamento] = useState("");
 	const [idLocal, setIdLocal] = useState("");
+	const [equipamentos, setEquipamentos] = useState<{ id_equipamento: number; descricao: string }[]>([]);
+	const [locais, setLocais] = useState<{ id_local: number; nome_local: string }[]>([]);
+		useEffect(() => {
+			async function fetchData() {
+				try {
+					const eqRes = await fetch(`${API_BASE_URL}/utils/equipments`);
+					const eqData = await eqRes.json();
+					setEquipamentos(eqData);
+					const locRes = await fetch(`${API_BASE_URL}/utils/locations`);
+					const locData = await locRes.json();
+					setLocais(locData);
+				} catch {}
+			}
+			fetchData();
+		}, []);
 	const [descricaoProblema, setDescricaoProblema] = useState("");
 	const [erro, setErro] = useState("");
 	const [loading, setLoading] = useState(false);
@@ -60,28 +75,36 @@ export default function CreatePostPage() {
 			<form onSubmit={handleSubmit} className="space-y-4">
 				<div className="grid gap-4 sm:grid-cols-2">
 					<div className="space-y-1">
-						<label className="text-xs font-medium text-slate-200">
-							ID do Equipamento
-						</label>
-						<input
-							type="number"
+						<label className="text-xs font-medium text-slate-200">Equipamento</label>
+						<select
 							className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2 text-sm text-slate-50 outline-none transition focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400"
 							value={idEquipamento}
 							onChange={(e) => setIdEquipamento(e.target.value)}
 							required
-						/>
+						>
+							<option value="">Selecione...</option>
+							{equipamentos.map((eq) => (
+								<option key={eq.id_equipamento} value={eq.id_equipamento}>
+									{eq.descricao}
+								</option>
+							))}
+						</select>
 					</div>
 					<div className="space-y-1">
-						<label className="text-xs font-medium text-slate-200">
-							ID do Local
-						</label>
-						<input
-							type="number"
+						<label className="text-xs font-medium text-slate-200">Local</label>
+						<select
 							className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2 text-sm text-slate-50 outline-none transition focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400"
 							value={idLocal}
 							onChange={(e) => setIdLocal(e.target.value)}
 							required
-						/>
+						>
+							<option value="">Selecione...</option>
+							{locais.map((loc) => (
+								<option key={loc.id_local} value={loc.id_local}>
+									{loc.nome_local}
+								</option>
+							))}
+						</select>
 					</div>
 				</div>
 

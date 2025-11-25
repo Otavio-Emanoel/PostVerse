@@ -239,7 +239,7 @@ INSERT INTO usuarios (nome, email, senha_hash, tipo_usuario) VALUES
 
 -- Equipamentos e locais de exemplo
 INSERT INTO equipamentos (descricao, numero_serie) VALUES
-('Computador Laboratório 1', 'PC-LAB1-001'),
+('Computador 1', 'PC-LAB1-001'),
 ('Impressora Sala dos Professores', 'IMP-PROF-010');
 
 INSERT INTO locais (nome_local, descricao) VALUES
