@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { API_BASE_URL } from "@/services/api";
 
 export default function Navbar() {
-  const [user, setUser] = useState<{ nome?: string } | null>(null);
+  const [user, setUser] = useState<{ nome?: string; tipo_usuario?: string } | null>(null);
 
   useEffect(() => {
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
@@ -47,6 +47,22 @@ export default function Navbar() {
         </Link>
         {user ? (
           <>
+            {user.tipo_usuario === "SUPORTE" && (
+              <>
+                <Link
+                  href="/equipamentos/add"
+                  className="rounded-full px-3 py-1 text-sky-200 hover:bg-sky-800/80 transition-colors"
+                >
+                  Adicionar Equipamento
+                </Link>
+                <Link
+                  href="/locais/add"
+                  className="rounded-full px-3 py-1 text-amber-200 hover:bg-amber-800/80 transition-colors"
+                >
+                  Adicionar Local
+                </Link>
+              </>
+            )}
             <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-emerald-300">
               {user.nome || "Usuário"}
             </span>

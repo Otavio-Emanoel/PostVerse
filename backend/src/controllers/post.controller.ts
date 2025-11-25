@@ -48,10 +48,16 @@ export async function updatePost(req: Request, res: Response) {
   const { descricao_problema, status, descricao_solucao } = req.body;
   try {
     const db = await getDbConnection();
-    const [result]: any = await db.query(
-      'UPDATE chamados SET descricao_problema = ?, status = ?, descricao_solucao = ? WHERE id_chamado = ?',
-      [descricao_problema, status, descricao_solucao, id]
-    );
+    let query = '';
+    let params: any[] = [];
+    if (status === 'CONCLUIDO') {
+      query = 'UPDATE chamados SET descricao_problema = ?, status = ?, descricao_solucao = ?, data_fechamento = NOW() WHERE id_chamado = ?';
+      params = [descricao_problema, status, descricao_solucao, id];
+    } else {
+      query = 'UPDATE chamados SET descricao_problema = ?, status = ?, descricao_solucao = ?, data_fechamento = NULL WHERE id_chamado = ?';
+      params = [descricao_problema, status, descricao_solucao, id];
+    }
+    const [result]: any = await db.query(query, params);
     if (result.affectedRows > 0) {
       return res.json({ message: 'Post atualizado com sucesso' });
     } else {
